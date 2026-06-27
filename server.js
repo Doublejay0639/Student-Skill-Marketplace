@@ -2,7 +2,9 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import prisma from './config/db.js';
-import router from './routes/authRoute.js';
+import authRouter from './routes/authRoute.js';
+import listingRouter from './routes/listingRoute.js';
+import categoryRouter from './routes/categoryRoute.js';
 
 dotenv.config();
 
@@ -13,7 +15,9 @@ const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
-app.use("/api/auth", router);
+app.use("/api/auth", authRouter);
+app.use("/api/listings", listingRouter);
+app.use("/api/categories", categoryRouter);
 
 
 app.get('/', (req, res) => {
