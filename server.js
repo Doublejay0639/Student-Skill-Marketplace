@@ -5,6 +5,7 @@ import prisma from './config/db.js';
 import authRouter from './routes/authRoute.js';
 import listingRouter from './routes/listingRoute.js';
 import categoryRouter from './routes/categoryRoute.js';
+import bookingRouter from './routes/bookingroute.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/listings", listingRouter);
 app.use("/api/categories", categoryRouter);
+app.use("/api/bookings", bookingRouter);
 
 
 app.get('/', (req, res) => {
