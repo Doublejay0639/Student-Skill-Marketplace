@@ -15,9 +15,36 @@ export const createListing = async({title, description, price, categoryId, userI
     return newListing;
 }
 
-export const getAllListings = async () => {
+// export const getAllListings = async () => {
+//     const allListings = await prisma.skillListing.findMany({
+//         where: {available: true},
+//         //including related data
+//         include: {
+//             user: {
+//                 select: { id: true, name: true, bio: true} //select let's us return only specific fields (don't wanna return the password/email)
+//             },
+//             category: true
+//         }
+//     })
+//     return allListings;
+// }
+
+export const getAllListings = async ({page, limit, category, search, minPrice, maxPrice}) => {
+    const pageNum = parseInt(page) || 1
+    const limitNum = parseInt(limit) || 10
+    const where = {
+        available: true,
+        ...(search && {
+            title: { contains: search, mode: 'insensitive' }
+        }),
+        ...(category && { categoryId: category }),
+        ...(minPrice && { price: { gte: parseFloat(minPrice) } }),
+        ...(maxPrice && { price: { lte: parseFloat(maxPrice) } }),
+    }
     const allListings = await prisma.skillListing.findMany({
-        where: {available: true},
+        where,
+        skip: (pageNum - 1) * limitNum,
+        take: limitNum,
         //including related data
         include: {
             user: {
@@ -26,7 +53,11 @@ export const getAllListings = async () => {
             category: true
         }
     })
-    return allListings;
+    
+    const total = await prisma.skillListing.count({
+        where
+    })
+    return [ allListings, total ];
 }
 
 export const getListingById = async (id) => {

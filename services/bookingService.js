@@ -39,18 +39,29 @@ export const createBooking = async ({ listingId, scheduledAt, seekerId }) => {
 }
 
 
-export const getMyBookings = async (seekerId) => {
+export const getMyBookings = async (seekerId, {page, limit, status}) => {
+    const pageNum = parseInt(page) || 1
+    const limitNum = parseInt(limit) || 10
+    const where = {
+        seekerId ,
+        ...(status && { status })
+    }
     const bookings = await prisma.booking.findMany({
-        where: { seekerId },
+        // where: { seekerId },
+        where,
+        skip: (pageNum - 1) * limitNum,
+        take: limitNum,
         include: {
             listing: {
                 select: {id: true, title: true, description: true, price: true}
             }
         }
     })
-    return bookings
+    const total = await prisma.booking.count({
+        where
+    })
+    return [bookings, total]
 }
-
 
 export const confirmBooking = async (id) => {
     const booking = await prisma.booking.findUnique({

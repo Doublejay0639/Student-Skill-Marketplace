@@ -53,10 +53,13 @@ export const createReview = async (req, res) => {
 export const getListingReviews = async (req, res) => {
     try {
         const { listingId } = req.params
-        const reviews = await getListingReviewsService(listingId)
+        const { page, limit, rating } = req.query
+        const [reviews, total] = await getListingReviewsService(listingId, { page, limit, rating })
+        const totalPages = Math.ceil(total / (parseInt(limit) || 10))
         return res.status(200).json({
             message: "Reviews fetched successfully",
-            data: reviews
+            data: reviews,
+            pagination: { total, page, limit, totalPages}
         })
     } catch (error) {
         return res.status(500).json({

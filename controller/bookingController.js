@@ -51,10 +51,15 @@ export const createBooking = async(req, res) => {
 export const getMyBookings = async (req, res) => {
     try {
         const seekerId = req.user.id
-        const allBookings = await getMyBookingsService(seekerId)
+        const { page, limit, status} = req.query
+        const [allBookings, total] = await getMyBookingsService(seekerId, { page, limit, status })
+
+        const totalPages = Math.ceil(total / (parseInt(limit) || 10))
+
         return res.status(200).json({
             message: "All bookings:",
-            data: allBookings
+            data: allBookings,
+            pagination: { total, page, limit, totalPages }
         })
     } catch (error) {
         return res.status(500).json({

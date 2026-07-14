@@ -42,9 +42,14 @@ export const createListing = async(req, res) => {
 
 export const getListings = async (req, res) => {
     try {
-        const listings = await getAllListings()
+        const { page, limit, category, search, minPrice, maxPrice } = req.query
+        const [listings, total] = await getAllListings({page, limit, category, search, minPrice, maxPrice})
+
+        const totalPages = Math.ceil(total / (parseInt(limit) || 10))
+
         return res.status(200).json({
-            data: listings
+            data: listings,
+            pagination: { total, page, limit, totalPages }
         })
     } catch (error) {
         return res.status(500).json({

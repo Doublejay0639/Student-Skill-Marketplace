@@ -43,18 +43,27 @@ export const createReview = async ({rating, comment, bookingId, reviewerId}) => 
 }
 
 
-export const getListingReviews = async (listingId) => {
-    const reviews = await prisma.review.findMany({
-        where: {
-            booking: {
-                listingId
-            }
+export const getListingReviews = async (listingId, {page, limit, rating}) => {
+    const pageNum = parseInt(page) || 1
+    const limitNum = parseInt(limit) || 10
+    const where = {
+        booking: {
+            listingId
         },
+        ...(rating && {rating: parseInt(rating)}),
+    }
+    const reviews = await prisma.review.findMany({
+        where,
+        skip: (pageNum - 1) * limitNum,
+        take: limitNum,
         include: {
             reviewer: {
                 select: {name: true}
             }
         }
     })
-    return reviews
+    const total = await prisma.review.count({
+        where
+    })
+    return [reviews, total]
 }
