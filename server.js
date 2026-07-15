@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './config/swagger.js'
 import helmet from 'helmet' //middleware security
 import rateLimit from 'express-rate-limit' //middleware security
 import prisma from './config/db.js';
@@ -38,6 +40,8 @@ app.use("/api/reviews", reviewRouter);
 app.get('/', (req, res) => {
     res.send("Hi");
 })
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(globalHandler)
 
