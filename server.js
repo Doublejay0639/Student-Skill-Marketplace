@@ -6,6 +6,7 @@ import { swaggerSpec } from './config/swagger.js'
 import helmet from 'helmet' //middleware security
 import rateLimit from 'express-rate-limit' //middleware security
 import prisma from './config/db.js';
+import connectDB from './config/mongodb.js'
 import authRouter from './routes/authRoute.js';
 import listingRouter from './routes/listingRoute.js';
 import categoryRouter from './routes/categoryRoute.js';
@@ -14,7 +15,6 @@ import reviewRouter from './routes/reviewRoute.js';
 import { globalHandler } from './middlewares/errorMiddleware.js';
 
 dotenv.config();
-
 const app = express();
 
 
@@ -49,13 +49,15 @@ app.use(globalHandler)
 const startServer = async () => {
     try {
         await prisma.$connect();
-        console.log('Database connected successfully');
+        console.log('PostgreSQL connected successfully');
+
+        await connectDB();
 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
     } catch (error) {
-        console.error('Database connection failed', error);
+        console.error('Server startup failed', error);
         process.exit(1);
     }
 };

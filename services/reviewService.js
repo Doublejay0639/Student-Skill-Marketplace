@@ -1,5 +1,7 @@
 import 'dotenv/config'
 import prisma from '../config/db.js'
+import { createNotification } from './notificationService.js'
+
 
 
 export const createReview = async ({rating, comment, bookingId, reviewerId}) => {
@@ -36,8 +38,26 @@ export const createReview = async ({rating, comment, bookingId, reviewerId}) => 
             reviewerId,
             rating,
             comment
+        },
+        include: {
+            booking: {
+                select: {
+                    listing: {
+                        select: {
+                            userId: true,
+                            title: true
+                        }
+                    }
+                }
+            }
         }
     })
+
+    try {
+        await createNotification({userId: review.booking.listing.userId, type: 'NEW_REVIEW', payload: {bookingId: review.bookingId, reviewId: review.id, listing_title: review.booking.listing.title, rating: rating}})
+    } catch (error) {
+        console.error('Notification failed: ', error)
+    }
 
     return review
 }
