@@ -12,6 +12,7 @@ import listingRouter from './routes/listingRoute.js';
 import categoryRouter from './routes/categoryRoute.js';
 import bookingRouter from './routes/bookingroute.js';
 import reviewRouter from './routes/reviewRoute.js';
+import notificationRouter from './routes/notificationRoute.js';
 import { globalHandler } from './middlewares/errorMiddleware.js';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use("/api/listings", listingRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/bookings", bookingRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/notifications", notificationRouter);
 
 app.get('/', (req, res) => {
     res.send("Hi");
