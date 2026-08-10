@@ -1,5 +1,7 @@
 import request from 'supertest';
-import app from '../server.js'
+import app from '../app.js'
+import { cleanDb, cleanNotificationDB } from "../utils/cleanDatabase.js";
+
 
 let token
 
@@ -31,5 +33,8 @@ describe('Category', () => {
         expect(res.status).toBe(200)
         expect(res.body.data.length).toBeGreaterThan(0)
         expect(Array.isArray(res.body.data)).toBe(true)
+    })
+    afterAll(async () => {
+        await cleanDb();
     })
 })

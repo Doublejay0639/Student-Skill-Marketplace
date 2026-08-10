@@ -1,5 +1,7 @@
 import request from 'supertest'
-import app from '../server.js'
+import app from '../app.js'
+import { cleanDb, cleanNotificationDB } from "../utils/cleanDatabase.js";
+
 
 let token
 let listingId
@@ -47,5 +49,8 @@ describe('Listings', () => {
         expect(res.body.data).toHaveProperty('categoryId')
         expect(res.body.data.user).toHaveProperty('id')
         expect(res.body.data.category).toHaveProperty('name')
+    })
+    afterAll(async () => {
+        await cleanDb();
     })
 })

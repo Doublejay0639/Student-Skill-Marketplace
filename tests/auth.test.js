@@ -1,5 +1,6 @@
 import request from 'supertest'
-import app from '../server.js'
+import app from '../app.js'
+import { cleanDb, cleanNotificationDB} from "../utils/cleanDatabase.js";
 
 
 describe('Auth', () => {
@@ -7,10 +8,10 @@ describe('Auth', () => {
       const res = await request(app)  
       .post('/api/auth/register')
       .send({
-        name: 'Test User4',
-        email: 'test4@example.com',
+        name: 'Test User',
+        email: 'test@example.com',
         password: 'password123',
-        bio: 'Test bio4'
+        bio: 'Test bio'
       })
     expect(res.status).toBe(201)
     expect(res.body.message).toBe('Account created successfully')
@@ -30,5 +31,8 @@ describe('Auth', () => {
         expect(res.body.data).toHaveProperty('id')
         expect(res.body.data).toHaveProperty('createdAt')
         expect(res.body).toHaveProperty('token');
+    })
+    afterAll(async () => {
+      await cleanDb();
     })
 })

@@ -1,5 +1,6 @@
 import request from "supertest";
-import app from "../server.js";
+import app from "../app.js";
+import { cleanDb, cleanNotificationDB } from "../utils/cleanDatabase.js";
 
 let token
 let bookingId
@@ -35,5 +36,9 @@ describe('Bookings', () => {
         .set('Authorization', `Bearer ${token}`)
         expect(res.status).toBe(200)
         expect(res.body.data).toHaveProperty('status')
+    })
+    afterAll(async () => {
+        await cleanDb();
+        await cleanNotificationDB();
     })
 })

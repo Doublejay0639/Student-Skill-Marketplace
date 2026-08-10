@@ -7,7 +7,7 @@
     "postinstall": "npx prisma generate",
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles"
+    "test": "node --experimental-vm-modules --no-experimental-require-module node_modules/jest/bin/jest.js --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +39,7 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "transform": {}
+    "transform": {},
+    "setupFiles": ["./jest.setup.js"]
   }
 }
