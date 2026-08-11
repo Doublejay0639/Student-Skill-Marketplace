@@ -1,9 +1,24 @@
 import request from 'supertest'
 import app from '../app.js'
-import { cleanDb, cleanNotificationDB} from "../utils/cleanDatabase.js";
+import bcrypt from 'bcryptjs';
+import prisma from '../config/db.js';
+import { cleanDb} from "../utils/cleanDatabase.js";
 
 
 describe('Auth', () => {
+    beforeAll(async () => {
+      const hashedPassword = await bcrypt.hash("password123", 10);
+      const loginUser = await prisma.user.create({
+        data: {
+          name: "Login User",
+          email: "loginuser@example.com",
+          password: hashedPassword
+        }
+      })
+    })
+    afterAll(async () => {
+      await cleanDb();
+    })
     it('should register a new user', async () => {
       const res = await request(app)  
       .post('/api/auth/register')
@@ -23,7 +38,7 @@ describe('Auth', () => {
         const res = await request(app)
         .post('/api/auth/login')
         .send({
-            email: 'test@example.com',
+            email: 'loginuser@example.com',
             password: 'password123'
         })
         expect(res.status).toBe(200)
@@ -31,8 +46,5 @@ describe('Auth', () => {
         expect(res.body.data).toHaveProperty('id')
         expect(res.body.data).toHaveProperty('createdAt')
         expect(res.body).toHaveProperty('token');
-    })
-    afterAll(async () => {
-      await cleanDb();
     })
 })

@@ -1,18 +1,39 @@
 import request from 'supertest'
 import app from '../app.js'
-import { cleanDb, cleanNotificationDB } from "../utils/cleanDatabase.js";
+import bcrypt from 'bcryptjs';
+import prisma from '../config/db.js';
+import { cleanDb } from "../utils/cleanDatabase.js";
 
 
 let token
 let listingId
+let categoryId
 
 describe('Listings', () => {
     beforeAll(async () => {
+        const hashedPassword = await bcrypt.hash("password123", 10)
+
+        const provider = await prisma.user.create({
+            data: {
+                name: "Provider User",
+                email: "provider@example.com",
+                password: hashedPassword
+            }
+        })
+
+        const category = await prisma.category.create({
+            data: {
+                name: "Test Category",
+                slug: "test-category",
+            }
+        })
+        categoryId = category.id
+
         //login and get token before tests run
         const res = await request(app)
             .post('/api/auth/login')
             .send({
-                email: 'test@example.com',
+                email: 'provider@example.com',
                 password: 'password123'
             })
         token = res.body.token
@@ -25,7 +46,7 @@ describe('Listings', () => {
             title: 'Test Title',
             description: 'Test Description for a student skil marketplace platform with automated testing using Jest and Supertest.',
             price: 1000,
-            categoryId: 'f57a2d92-9501-4c86-b192-b6045197f136'
+            categoryId: categoryId
         })
         expect(res.status).toBe(201)
         expect(res.body.data).toHaveProperty('title')
